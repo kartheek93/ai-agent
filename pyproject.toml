@@ -1,0 +1,17 @@
+[project]
+name = "multi-agent-productivity-assistant"
+version = "1.0.0"
+description = "Python multi-agent productivity assistant with SQLite, orchestrated agents, and optional Gemini on Vertex AI"
+readme = "README.md"
+requires-python = ">=3.11"
+
+[project.optional-dependencies]
+google-workspace = [
+    "google-api-python-client>=2.170.0",
+    "google-auth-httplib2>=0.2.0",
+    "google-auth-oauthlib>=1.2.2",
+]
+
+[tool.setuptools.packages.find]
+include = ["backend*"]
+exclude = ["frontend*", "data*", "test_runtime*", "tests*"]

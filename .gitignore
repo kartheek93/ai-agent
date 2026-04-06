@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Secrets & credentials — NEVER commit these
+.env
+.env.*
+!.env.example
+client_secret*.json
+*_token.json
+google_token.json
+service_account*.json
+credentials*.json
+token*.json
+
+# Data (SQLite, runtime files)
+data/
+.tmp-tests/
+test_runtime/
+
+# Frontend build artifacts
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/settings.json
+*.swp

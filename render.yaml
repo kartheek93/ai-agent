@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: flowpilot-ai-agent
+    runtime: docker
+    plan: free
+    envVars:
+      - key: PORT
+        value: 3000
+      - key: VITE_APP_PASSWORD
+        value: flowpilot
+    healthCheckPath: /api/health
