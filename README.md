@@ -157,7 +157,7 @@ curl -X POST http://127.0.0.1:3000/api/google/gmail/send ^
   -d "{\"to\":\"friend@example.com\",\"subject\":\"Quick update\",\"body\":\"Sharing the latest assistant demo build.\"}"
 ```
 
-## Optional Gemini 2.5 Flash integration
+## Gemini 2.5 Flash integration
 
 The backend works without any cloud setup. If you want Gemini advice added to workflow responses, configure Vertex AI:
 
@@ -170,7 +170,7 @@ The backend works without any cloud setup. If you want Gemini advice added to wo
 
 When configured, the orchestrator sends the already-structured workflow result to Vertex AI and adds a short advisory note from `gemini-2.5-flash` to the response payload.
 
-## Optional Google Workspace integration
+## Google Workspace integration
 
 The local SQLite-backed experience still works without any Google setup. If you want the project to read and write Google Calendar events, read and write Google Tasks, and send Gmail from the same orchestrated backend, configure Google Workspace OAuth:
 
