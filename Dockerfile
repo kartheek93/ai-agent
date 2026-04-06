@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certifi
 
 # --- Python deps ---
 COPY pyproject.toml .
-RUN pip install --no-cache-dir -e "."
+RUN pip install --no-cache-dir -e ".[google-workspace]"
 
 # --- Frontend build ---
 COPY frontend/package*.json ./frontend/
