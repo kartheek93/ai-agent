@@ -637,10 +637,57 @@ def create_server(context: AppContext, host: str = "127.0.0.1", port: int = 3000
     return ThreadingHTTPServer((host, port), build_handler(context))
 
 
+def bootstrap_google_credentials() -> None:
+    """Write Google credentials from environment variables to disk.
+
+    On cloud platforms (Render, Railway, etc.) we cannot commit credential
+    files. Instead we store their JSON content in env vars and write them
+    to the expected paths at startup.
+
+    Supported env vars:
+      GOOGLE_TOKEN_JSON          — full JSON of the OAuth token file
+      GOOGLE_CLIENT_SECRET_JSON  — full JSON of the client_secret_*.json file
+    """
+    import json
+    import os
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parent.parent
+
+    token_json = os.environ.get("GOOGLE_TOKEN_JSON", "").strip()
+    if token_json:
+        token_path = Path(os.environ.get("GOOGLE_TOKEN_PATH", str(root / "data" / "google_token.json")))
+        token_path.parent.mkdir(parents=True, exist_ok=True)
+        if not token_path.exists():
+            token_path.write_text(token_json, encoding="utf-8")
+            print(f"[bootstrap] Wrote Google token to {token_path}")
+        else:
+            print(f"[bootstrap] Google token already exists at {token_path}, skipping.")
+
+    secret_json = os.environ.get("GOOGLE_CLIENT_SECRET_JSON", "").strip()
+    if secret_json:
+        # Parse to discover the client_id for a stable filename
+        try:
+            data = json.loads(secret_json)
+            client_id = (data.get("installed") or data.get("web") or {}).get("client_id", "oauth")
+        except Exception:
+            client_id = "oauth"
+        secret_path = root / "data" / f"client_secret_{client_id}.json"
+        secret_path.parent.mkdir(parents=True, exist_ok=True)
+        if not secret_path.exists():
+            secret_path.write_text(secret_json, encoding="utf-8")
+            os.environ.setdefault("OAUTH_JSON_PATH", str(secret_path))
+            print(f"[bootstrap] Wrote client secret to {secret_path}")
+        else:
+            os.environ.setdefault("OAUTH_JSON_PATH", str(secret_path))
+            print(f"[bootstrap] Client secret already exists at {secret_path}, skipping.")
+
+
 def start_server(host: str | None = None, port: int | None = None, db_path: str | None = None, seed_demo_data: bool = True) -> None:
     import os
     load_env_file()
     cleared_proxy_keys = sanitize_broken_proxy_env()
+    bootstrap_google_credentials()
     # Render and other cloud hosts inject PORT; bind to 0.0.0.0 so containers are reachable.
     resolved_port = port or int(os.environ.get("PORT", 3000))
     resolved_host = host or ("0.0.0.0" if os.environ.get("PORT") else "127.0.0.1")
@@ -654,6 +701,7 @@ def start_server(host: str | None = None, port: int | None = None, db_path: str 
     finally:
         server.server_close()
         context.close()
+
 
 
 if __name__ == "__main__":
